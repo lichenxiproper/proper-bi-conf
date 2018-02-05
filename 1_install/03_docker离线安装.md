@@ -21,7 +21,7 @@ $ vi /etc/profile
 ulimit -n 65539
 $ source /etc/profile
 ```
-- 调整swap
+- ubuntu调整swap
 ```
 $ vi /etc/default/grub
 # 修改文件内[GRUB_CMDLINE_LINUX=""]->[GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"]，保存并退出
