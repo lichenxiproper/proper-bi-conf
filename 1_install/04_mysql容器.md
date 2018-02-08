@@ -1,7 +1,7 @@
 ## mysql容器 ##
 - 启动mysql容器
 ```
-$ docker run --name mysql_oa -p 3306:3306 -v /opt/docker/mysql_oa/conf:/etc/mysql/conf.d -v /opt/docker/mysql_oa/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=oa -e MYSQL_USER=oa -e MYSQL_PASSWORD=123456 -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+$ docker run --name mysql_hadoop -p 3306:3306 -v /opt/docker/mysql_hadoop/conf:/etc/mysql/conf.d -v /opt/docker/mysql_hadoop/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=cmf -e MYSQL_USER=cmf -e MYSQL_PASSWORD=123456 -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 - 启动binlog
 ```
