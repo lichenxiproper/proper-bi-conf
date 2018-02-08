@@ -7,10 +7,13 @@ http://blog.csdn.net/eason_oracle/article/details/51818423
 ```
 - 下载文件
 ```
-http://archive.cloudera.com/cm5/cm/5/cloudera-manager-centos7-cm5.13.1_x86_64.tar.gz
-http://archive.cloudera.com/cdh5/parcels/5.13.1/CDH-5.13.1-1.cdh5.13.1.p0.2-el7.parcel
-http://archive.cloudera.com/cdh5/parcels/5.13.1/CDH-5.13.1-1.cdh5.13.1.p0.2-el7.parcel.sha1	
-http://archive.cloudera.com/cdh5/parcels/5.13.1/manifest.json
+https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/cloudera-manager.repo
+https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/5.14.0/RPMS/x86_64/cloudera-manager-agent-5.14.0-1.cm5140.p0.25.el7.x86_64.rpm
+https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/5.14.0/RPMS/x86_64/cloudera-manager-daemons-5.14.0-1.cm5140.p0.25.el7.x86_64.rpm
+https://archive.cloudera.com/cm5/redhat/7/x86_64/cm/5.14.0/RPMS/x86_64/cloudera-manager-server-5.14.0-1.cm5140.p0.25.el7.x86_64.rpm
+http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el7.parcel
+http://archive.cloudera.com/cdh5/parcels/5.14.0/CDH-5.14.0-1.cdh5.14.0.p0.24-el7.parcel.sha1
+http://archive.cloudera.com/cdh5/parcels/5.14.0/manifest.json
 https://dev.mysql.com/downloads/connector/j/
 ```
 - 基本配置（所有节点）
@@ -45,9 +48,6 @@ $ chmod 600 authorized_keys
 $ scp authorized_keys root@centos1:~/.ssh
 $ scp authorized_keys root@centos2:~/.ssh
 ```
-- 创建数据库
-```
-$ docker run --name mysql_hadoop -p 3307:3306 -v /opt/docker/mysql_hadoop/conf:/etc/mysql/conf.d -v /opt/docker/mysql_hadoop/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=cmf -e MYSQL_USER=cmf -e MYSQL_PASSWORD=123456 -d mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 - 关闭防火墙（所有节点）
 ```
 $ systemctl stop firewalld.service
@@ -64,52 +64,48 @@ $ yum install ntp
 $ chkconfig ntpd on
 $ service ntpd start
 ```
-- 安装插件
+- 安装cloudear manager
 ```
-$ yum -y install psmisc
-```
-- 解压cloudear manager
-```
-tar -zxvf cloudera-manager-centos7-cm5.13.1_x86_64.tar.gz
+$ yum --nogpgcheck localinstall cloudera-manager-daemons-5.14.0-1.cm5140.p0.25.el7.x86_64.rpm
+$ yum --nogpgcheck localinstall cloudera-manager-server-5.14.0-1.cm5140.p0.25.el7.x86_64.rpm
+$ yum --nogpgcheck localinstall cloudera-manager-agent-5.14.0-1.cm5140.p0.25.el7.x86_64.rpm cloudera-manager-daemons
 ```
 - 复制安装包
 ```
-# 修改CDH-5.13.1-1.cdh5.13.1.p0.2-el7.parcel.sha1为CDH-5.13.1-1.cdh5.13.1.p0.2-el7.parcel.sha
+# 修改CDH-5.14.0-1.cdh5.14.0.p0.24-el7.parcel.sha1为CDH-5.14.0-1.cdh5.14.0.p0.24-el7.parcel.sha
 # 将3个cdh文件复制到/opt/cloudera/parcel-repo/
 ```
 - 复制mysql驱动
 ```
-# 驱动复制到/opt/cm-5.13.1/share/cmf/lib/
-# hive等安装时需要复制到指定软件内
-```
-- 配置agent
-```
-$ vi /opt/cm-5.13.1/etc/cloudera-scm-agent/config.ini
-server_host=centos1
-```
-- 复制agent到其他节点
-```
-$ scp -r /opt/cm-5.13.1 centos2:/opt
-$ scp -r /opt/cm-5.13.1 centos3:/opt
-```
-- 创建用户（所有节点）
-```
-$ useradd --system --home=/opt/cm-5.13.1/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment "Cloudera SCM User" cloudera-scm
+# 驱动复制到//usr/share/cmf/lib/
 ```
 - 设置数据库
 ```
-$ /opt/cm-5.13.1/share/cmf/schema/scm_prepare_database.sh mysql -hcentos1 -P3307 —scm-host centos1 cmf cmf 123456
-$ cat cm-5.13.1/etc/cloudera-scm-server/db.properties
+$ /usr/share/cmf/schema/scm_prepare_database.sh mysql -hcentosd -P3306 cmf cmf 123456
+```
+- 配置agent
+```
+$ vi /etc/cloudera-scm-agent/config.ini
+server_host=centos1
 ```
 - 启动
 ```
-# 启动server
-$ /opt/cm-5.13.1/etc/init.d/cloudera-scm-server start
 # 启动agent（所有节点）
-$ /opt/cm-5.13.1/etc/init.d/cloudera-scm-agent start
+$ service cloudera-scm-agent start
+# 启动server
+$ service cloudera-scm-server start
+# 查看server启动log
+$ tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log
+# 查看启动端口
+$ netstat -ntlp
 ```
 - 连接
 ```
 http://192.168.1.201:7180/
 admin/admin
+```
+- 复制mysql驱动
+```
+hive目录
+oozie目录
 ```
