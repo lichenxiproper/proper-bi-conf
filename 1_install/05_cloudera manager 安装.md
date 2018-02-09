@@ -77,7 +77,7 @@ $ yum --nogpgcheck localinstall cloudera-manager-agent-5.14.0-1.cm5140.p0.25.el7
 ```
 - 复制mysql驱动
 ```
-# 驱动复制到//usr/share/cmf/lib/
+# 驱动复制到/usr/share/cmf/lib/
 ```
 - 设置数据库
 ```
@@ -106,6 +106,6 @@ admin/admin
 ```
 - 复制mysql驱动
 ```
-hive目录
-oozie目录
+hive目录/opt/cloudera/parcels/CDH-5.14.0-1.cdh5.14.0.p0.24/lib/hive/lib
+oozie目录/var/lib/oozie
 ```

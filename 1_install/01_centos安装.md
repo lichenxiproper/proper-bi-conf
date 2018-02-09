@@ -5,6 +5,10 @@
 $ vi /etc/hostname
 centos1
 ```
+- 查看网关
+```
+$ netstat -rn
+```
 - 配置固定 IP
 ```
 $ vi /etc/sysconfig/network-scripts/ifcfg-ens33
